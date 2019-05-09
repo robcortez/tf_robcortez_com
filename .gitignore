@@ -1,0 +1,6 @@
+variables.tf
+state.tf
+common.tf
+.terraform/
+files/*.zip
+.DS_Store

@@ -1,0 +1,18 @@
+# General
+variable "aws_account_no"     { default = "" }
+variable "environment"        { default = "development" }
+
+# VPC
+variable "vpc_cidr"           { default = "10.10.0.0/16" }
+
+# S3
+variable "bucket_prefix"      { default = "" }
+variable "domain"             { default = "" }
+
+# CloudFront
+variable "cname_alias"        { default = "" }
+
+# Certbot
+variable "certbot_sentry_dsn" { default = "" }
+variable "alerts_phone_num"   { default = "+15555555555" }
+variable "email"              { default = "mail@example.com" }
