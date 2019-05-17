@@ -1,21 +1,26 @@
-data "archive_file" "lambda" {
-  type        = "zip"
-  source_dir = "src"
-  output_path = "${path.module}/files/certbot_lambda.zip"
+resource "null_resource" "build_lambda" {
+  triggers {
+    build_number = "${timestamp()}"
+  }
+  provisioner "local-exec" {
+    command = "${path.module}/src/build.sh"
+    interpreter = ["bash", "-c"]
+  }
 }
 
+
 resource "aws_lambda_function" "certbot" {
-  filename          = "${path.module}/files/certbot_lambda.zip"
+  filename          = "${path.module}/files/certbot-lambda.zip"
   function_name     = "certbot-lambda"
   role              = "${aws_iam_role.lambda_role.arn}"
   handler           = "main.handler"
-  source_code_hash  = "${data.archive_file.lambda.output_base64sha256}"
+  source_code_hash  = "${filebase64sha256("${path.module}/files/certbot-lambda.zip")}"
   runtime           = "python3.7"
   description       = "Renew Let's Encrypt wildcard cert and import new cert to ACM"
 
   environment {
     variables = {
-      LETSENCRYPT_DOMAINS = "${var.domain}"
+      LETSENCRYPT_DOMAINS = "${var.domain},*.${var.domain}"
       LETSENCRYPT_EMAIL = "${var.email}"
       NOTIFICATION_SNS_ARN = "${aws_sns_topic.alerts.arn}"
       SENTRY_DSN = "${var.certbot_sentry_dsn}"

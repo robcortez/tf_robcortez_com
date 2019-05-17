@@ -25,6 +25,33 @@ resource "aws_s3_bucket_policy" "policy" {
   policy = "${data.aws_iam_policy_document.s3_policy.json}"
 }
 
+resource "aws_s3_bucket_policy" "redirect_to_www" {
+  bucket = "${aws_s3_bucket.redirect_to_www.id}"
+  policy = "${data.aws_iam_policy_document.redirect_to_www.json}"
+}
+
+data "aws_iam_policy_document" "redirect_to_www" {
+  statement {
+    actions = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.redirect_to_www.arn}/*"]
+
+    principals {
+      type = "AWS"
+      identifiers = ["*"]
+    }
+  }
+
+  statement {
+    actions = ["s3:ListBucket"]
+    resources = ["${aws_s3_bucket.redirect_to_www.arn}"]
+
+    principals {
+      type = "AWS"
+      identifiers = ["*"]
+    }
+  }
+}
+
 data "aws_iam_policy_document" "lambda_policy" {
   statement {
     actions   = [

@@ -7,3 +7,15 @@ resource "aws_s3_bucket" "bucket" {
   }
 }
 
+resource "aws_s3_bucket" "redirect_to_www" {
+  bucket = "${var.domain}"
+
+  website {
+    redirect_all_requests_to = "https://www.${var.domain}"
+  }
+
+  tags = {
+    Environment = "${var.environment}"
+  }
+}
+

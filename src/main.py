@@ -97,7 +97,13 @@ def handler(event, context):
       cert = provision_cert(os.environ['LETSENCRYPT_EMAIL'], domains)
       upload_cert_to_acm(cert, domains)
       notify_via_sns(os.environ['NOTIFICATION_SNS_ARN'], domains, cert['certificate'])
-  except:
+  except Exception:
+    print(Exception)
+    print('problem')
     client = raven.Client(os.environ['SENTRY_DSN'], transport=raven.transport.http.HTTPTransport)
     client.captureException()
     raise
+
+if __name__ == '__main__':
+    print('Starting...')
+    handler({'event': 'yoo'}, None)
