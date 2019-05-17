@@ -11,5 +11,3 @@ RUN pip install -r requirements.txt -t .
 
 RUN zip -r certbot-lambda.zip .
 
-# docker build -t lambda-build-python .
-# docker run --rm lambda-build-python
