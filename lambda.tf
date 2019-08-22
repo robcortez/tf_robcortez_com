@@ -25,6 +25,7 @@ resource "aws_lambda_function" "certbot" {
       LETSENCRYPT_EMAIL = "${var.email}"
       NOTIFICATION_SNS_ARN = "${aws_sns_topic.alerts.arn}"
       SENTRY_DSN = "${var.certbot_sentry_dsn}"
+      CERT_BUCKET = "${var.cert_bucket}"
     }
   }
 }
