@@ -81,6 +81,27 @@ data "aws_iam_policy_document" "lambda_policy" {
       "arn:aws:acm:us-east-1:${var.aws_account_no}:certificate/*"
     ]
   }
+
+  statement {
+    actions   = [
+      "s3:ListBucket"
+    ]
+    resources = [
+      "${aws_s3_bucket.certs.arn}"
+    ]
+
+  statement {
+    actions   = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "${aws_s3_bucket.certs.arn}/*"
+    ]
+
+  }
+
 }
 
 resource "aws_iam_policy" "lambda_policy" {

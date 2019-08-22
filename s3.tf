@@ -19,3 +19,7 @@ resource "aws_s3_bucket" "redirect_to_www" {
   }
 }
 
+resource "aws_s3_bucket" "certs" {
+  bucket = "${format("certs.%s", var.domain)}"
+  acl = "private"
+}

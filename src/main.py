@@ -5,11 +5,24 @@ import os
 import raven
 import subprocess
 
+s3 = boto3.client('s3')
+
 def read_and_delete_file(path):
   with open(path, 'r') as file:
     contents = file.read()
   os.remove(path)
   return contents
+
+def upload_to_s3(domain, path):
+  first_domain = domains.split(',')[0]
+  file_name = os.path.basename(path)
+  object_name = "%s/%s" % (first_domain, file_name)
+  try:
+    response = s3.upload_file(path, os.environ["CERT_BUCKET"], object_name)
+  except ClientError as e:
+    print("Upload to s3 failed: ", e)
+    return False
+  return True
 
 def provision_cert(email, domains):
   certbot.main.main([
@@ -27,6 +40,13 @@ def provision_cert(email, domains):
 
   first_domain = domains.split(',')[0]
   path = '/tmp/config-dir/live/' + first_domain + '/'
+  cert_files = ['cert.pem', 'privkey.pem', 'chain.pem']
+
+  for c in cert_files:
+    upload = upload_to_s3("%s%s" % (path, c))
+    if not upload:
+      print('Failed to upload %s to s3' % c)
+
   return {
     'certificate': read_and_delete_file(path + 'cert.pem'),
     'private_key': read_and_delete_file(path + 'privkey.pem'),
@@ -59,14 +79,14 @@ def find_existing_cert(domains):
   return None
 
 def notify_via_sns(topic_arn, domains, certificate):
-  process = subprocess.Popen(['openssl', 'x509', '-noout', '-text'],
-    stdin=subprocess.PIPE, stdout=subprocess.PIPE, encoding='utf8')
-  stdout, stderr = process.communicate(certificate)
+  #process = subprocess.Popen(['openssl', 'x509', '-noout', '-text'],
+  #  stdin=subprocess.PIPE, stdout=subprocess.PIPE, encoding='utf8')
+  #stdout, stderr = process.communicate(certificate)
 
   client = boto3.client('sns')
   client.publish(TopicArn=topic_arn,
     Subject='Issued new LetsEncrypt certificate',
-    Message='Issued new certificates for domains: ' + domains,
+    Message='Issued new certificates for domains:\n' + domains.replace(",", "\n"),
   )
 
 def upload_cert_to_acm(cert, domains):

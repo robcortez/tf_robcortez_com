@@ -8,6 +8,7 @@ variable "vpc_cidr"           { default = "10.10.0.0/16" }
 # S3
 variable "bucket_prefix"      { default = "" }
 variable "domain"             { default = "" }
+variable "cert_bucket"        { default = "" }
 
 # CloudFront
 variable "cname_alias"        { default = "" }
