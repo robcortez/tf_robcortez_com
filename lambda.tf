@@ -16,6 +16,7 @@ resource "aws_lambda_function" "certbot" {
   handler           = "main.handler"
   source_code_hash  = "${filebase64sha256("${path.module}/files/certbot-lambda.zip")}"
   runtime           = "python3.7"
+  timeout           = 60
   description       = "Renew Let's Encrypt wildcard cert and import new cert to ACM"
 
   environment {

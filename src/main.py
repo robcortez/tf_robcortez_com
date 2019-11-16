@@ -66,7 +66,7 @@ def notify_via_sns(topic_arn, domains, certificate):
   client = boto3.client('sns')
   client.publish(TopicArn=topic_arn,
     Subject='Issued new LetsEncrypt certificate',
-    Message='Issued new certificates for domains: ' + domains + '\n\n' + stdout,
+    Message='Issued new certificates for domains: ' + domains,
   )
 
 def upload_cert_to_acm(cert, domains):
